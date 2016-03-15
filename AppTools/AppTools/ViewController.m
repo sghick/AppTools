@@ -19,8 +19,8 @@
     [super viewDidLoad];
     
     CompareDb *cp = [[CompareDb alloc] init];
-    cp.dbPath1 = @"/Users/buding/Desktop/dbA.sqlite";
-    cp.dbPath2 = @"/Users/buding/Desktop/dbB.sqlite";
+    cp.dbPath1 = @"/Users/buding/Desktop/DB1.sqlite";
+    cp.dbPath2 = @"/Users/buding/Desktop/DB2.sqlite";
     [cp compareDb];
 }
 

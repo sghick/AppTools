@@ -685,16 +685,45 @@ NSString * const dbColumnTypeBoolean = @"BOOLEAN";
     return sql;
 }
 
+//+ (NSDictionary *)sqlColumnsFromCreateSql:(NSString *)sql {
+//    NSAssert([sql.uppercaseString hasPrefix:@"CREATE"], @"sql参数只能是基本的create sql");
+//    NSInteger startIndex = [sql rangeOfString:@"("].location;
+//    NSInteger endIndex = [sql rangeOfString:@")"].location;
+//    if ((startIndex != NSNotFound) && (endIndex != NSNotFound)) {
+//        NSString *conColumn = [sql substringWithRange:NSMakeRange(startIndex + 1, endIndex - startIndex - 1)];
+//        conColumn = [conColumn stringByReplacingOccurrencesOfString:@", " withString:@","];
+//        NSArray *comColumns = [conColumn componentsSeparatedByString:@","];
+//        NSMutableDictionary *columns = [NSMutableDictionary dictionary];
+//        for (NSString *comColumn in comColumns) {
+//            NSArray *coms = [comColumn componentsSeparatedByString:@" "];
+//            if (coms.count < 2) {
+//                NSAssert(NO, @"sql语句错误:%@", sql);
+//                return nil;
+//            }
+//            [columns setObject:coms[1] forKey:coms[0]];
+//        }
+//        return columns;
+//    }
+//    return nil;
+//}
 + (NSDictionary *)sqlColumnsFromCreateSql:(NSString *)sql {
     NSAssert([sql.uppercaseString hasPrefix:@"CREATE"], @"sql参数只能是基本的create sql");
-    NSInteger startIndex = [sql rangeOfString:@"("].location;
-    NSInteger endIndex = [sql rangeOfString:@")"].location;
+    NSString *nSql = [sql copy];
+    nSql = [nSql stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    nSql = [nSql stringByReplacingOccurrencesOfString:@"\t" withString:@""];
+    nSql = [nSql stringByReplacingOccurrencesOfString:@" \"" withString:@""];
+    nSql = [nSql stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+    NSInteger startIndex = [nSql rangeOfString:@"("].location;
+    NSInteger endIndex = [nSql rangeOfString:@")"].location;
     if ((startIndex != NSNotFound) && (endIndex != NSNotFound)) {
-        NSString *conColumn = [sql substringWithRange:NSMakeRange(startIndex + 1, endIndex - startIndex - 1)];
+        NSString *conColumn = [nSql substringWithRange:NSMakeRange(startIndex + 1, endIndex - startIndex - 1)];
         conColumn = [conColumn stringByReplacingOccurrencesOfString:@", " withString:@","];
         NSArray *comColumns = [conColumn componentsSeparatedByString:@","];
         NSMutableDictionary *columns = [NSMutableDictionary dictionary];
         for (NSString *comColumn in comColumns) {
+            if ([comColumn hasPrefix:@"PRIMARY KEY"]) {
+                continue;
+            }
             NSArray *coms = [comColumn componentsSeparatedByString:@" "];
             if (coms.count < 2) {
                 NSAssert(NO, @"sql语句错误:%@", sql);
